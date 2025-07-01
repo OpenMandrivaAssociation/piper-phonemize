@@ -11,6 +11,7 @@ License:       MIT
 
 BuildRequires: glibc-devel
 #BuildRequires: libespeak-ng-devel
+BuildRequires:  espeak-devel
 #BuildRequires: libstdc++6-devel
 BuildRequires: cmake
 Requires:      lib%{name} = %{?epoch:%epoch:}%{version}-%{release}
