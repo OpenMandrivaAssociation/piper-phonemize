@@ -1,22 +1,17 @@
 %define gitver %(echo %version | tr _ -)
 Name:          piper-phonemize
 Version:       2023.11.14_4
-Release:       2mamba
+Release:       1
 Summary:       C++ library for converting text to phonemes for Piper
 Group:         Applications/Multimedia
-Vendor:        openmamba
-Distribution:  openmamba
-Packager:      Silvan Calarco <silvan.calarco@mambasoft.it>
 URL:           https://github.com/rhasspy/piper-phonemize
-Source:        https://github.com/rhasspy/piper-phonemize.git/%{gitver}/piper-phonemize-%{version}.tar.bz2
-Patch0:        piper-phonemize-2023.11.14_4-system-espeak-ng.patch
+Source:        https://github.com/rhasspy/piper-phonemize/archive/%{gitver}/%{name}-%{gitver}.tar.gz
+#Patch0:        piper-phonemize-2023.11.14_4-system-espeak-ng.patch
 License:       MIT
-## AUTOBUILDREQ-BEGIN
+
 BuildRequires: glibc-devel
-BuildRequires: libespeak-ng-devel
-BuildRequires: libgcc
-BuildRequires: libstdc++6-devel
-## AUTOBUILDREQ-END
+#BuildRequires: libespeak-ng-devel
+#BuildRequires: libstdc++6-devel
 BuildRequires: cmake
 Requires:      lib%{name} = %{?epoch:%epoch:}%{version}-%{release}
 
@@ -42,38 +37,26 @@ This package contains libraries and header files for developing applications tha
 %debug_package
 
 %prep
-%setup -q
-%patch 0 -p1
+%autosetup -n %{name}-%{gitver} -p1
 
 %build
-%cmake \
-   -DESPEAK_NG_DIR=%{_prefix}
+%cmake
 
-%cmake_build
+%make_build
 
 %install
-[ "%{buildroot}" != / ] && rm -rf "%{buildroot}"
-%cmake_install
-
-%clean
-[ "%{buildroot}" != / ] && rm -rf "%{buildroot}"
-
-%post -n lib%{name} -p /sbin/ldconfig
-%postun -n lib%{name} -p /sbin/ldconfig
+%make_install -C build
 
 %files
-%defattr(-,root,root)
 %{_bindir}/piper_phonemize
 %{_datadir}/libtashkeel_model.ort
 
 %files -n lib%{name}
-%defattr(-,root,root)
 %{_libdir}/libonnxruntime.so.*
 %{_libdir}/libpiper_phonemize.so.*
 %doc LICENSE.md
 
 %files -n lib%{name}-devel
-%defattr(-,root,root)
 %{_includedir}/cpu_provider_factory.h
 %{_includedir}/onnxruntime_*h
 %dir %{_includedir}/piper-phonemize
