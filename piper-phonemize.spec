@@ -6,7 +6,7 @@ Summary:       C++ library for converting text to phonemes for Piper
 Group:         Applications/Multimedia
 URL:           https://github.com/rhasspy/piper-phonemize
 Source:        https://github.com/rhasspy/piper-phonemize/archive/%{gitver}/%{name}-%{gitver}.tar.gz
-#Patch0:        piper-phonemize-2023.11.14_4-system-espeak-ng.patch
+Patch0:        piper-phonemize-2023.11.14_4-system-espeak-ng.patch
 License:       MIT
 
 BuildRequires: glibc-devel
