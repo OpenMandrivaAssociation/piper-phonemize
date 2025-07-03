@@ -1,0 +1,12 @@
+--- piper-phonemize-2023.11.14_4/CMakeLists.txt.orig	2024-06-07 16:01:02.301745686 +0200
++++ piper-phonemize-2023.11.14_4/CMakeLists.txt	2024-06-07 16:01:12.653772280 +0200
+@@ -223,10 +223,6 @@
+ 
+ # Dependencies
+ install(
+-    DIRECTORY ${ESPEAK_NG_DIR}/
+-    DESTINATION ${CMAKE_INSTALL_PREFIX})
+-
+-install(
+     DIRECTORY ${ONNXRUNTIME_DIR}/include/
+     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
