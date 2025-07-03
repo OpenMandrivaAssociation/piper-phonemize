@@ -40,7 +40,7 @@ This package contains libraries and header files for developing applications tha
 %autosetup -n %{name}-%{gitver} -p1
 
 %build
-%cmake
+%cmake -DESPEAK_NG_DIR=%{_prefix}
 
 %make_build
 
