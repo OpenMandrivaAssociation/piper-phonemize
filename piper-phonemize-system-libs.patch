@@ -1,0 +1,87 @@
+diff -up piper-phonemize-2023.11.14/CMakeLists.txt.1~ piper-phonemize-2023.11.14/CMakeLists.txt
+--- piper-phonemize-2023.11.14/CMakeLists.txt.1~	2023-11-14 18:54:34.000000000 +0100
++++ piper-phonemize-2023.11.14/CMakeLists.txt	2025-11-16 19:30:00.813868181 +0100
+@@ -36,6 +36,10 @@ set_target_properties(piper_phonemize PR
+ 
+ # ---- onnxruntime ---
+ 
++option(SYSTEM_ONNXRUNTIME "Use system ONNX Runtime" ON)
++if(SYSTEM_ONNXRUNTIME)
++    include_directories(/usr/include/onnxruntime)
++else()
+ # Look for onnxruntime files in <root>/lib
+ if(NOT DEFINED ONNXRUNTIME_DIR)
+     if(NOT DEFINED ONNXRUNTIME_VERSION)
+@@ -94,9 +98,12 @@ if(NOT DEFINED ONNXRUNTIME_DIR)
+         file(ARCHIVE_EXTRACT INPUT "download/${ONNXRUNTIME_FILENAME}" DESTINATION "${CMAKE_CURRENT_LIST_DIR}/lib")
+     endif()
+ endif()
++endif()
+ 
+ # ---- espeak-ng ---
+ 
++option(SYSTEM_ESPEAK_NG "Use system espeak-ng" ON)
++if(NOT SYSTEM_ESPEAK_NG)
+ if(NOT DEFINED ESPEAK_NG_DIR)
+     set(ESPEAK_NG_DIR "${CMAKE_CURRENT_BINARY_DIR}/ei")
+ 
+@@ -119,6 +126,7 @@ if(NOT DEFINED ESPEAK_NG_DIR)
+     )
+     add_dependencies(piper_phonemize espeak_ng_external)
+ endif()
++endif()
+ 
+ 
+ # ---- Declare library ----
+@@ -222,10 +230,13 @@ install(
+     TYPE DATA)
+ 
+ # Dependencies
++if(NOT SYSTEM_ESPEAK_NG)
+ install(
+     DIRECTORY ${ESPEAK_NG_DIR}/
+     DESTINATION ${CMAKE_INSTALL_PREFIX})
++endif()
+ 
++if(NOT SYSTEM_ONNXRUNTIME)
+ install(
+     DIRECTORY ${ONNXRUNTIME_DIR}/include/
+     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+@@ -233,3 +244,4 @@ install(
+ install(
+     DIRECTORY ${ONNXRUNTIME_DIR}/lib/
+     DESTINATION ${CMAKE_INSTALL_LIBDIR})
++endif()
+diff -up piper-phonemize-2023.11.14/src/main.cpp.1~ piper-phonemize-2023.11.14/src/main.cpp
+--- piper-phonemize-2023.11.14/src/main.cpp.1~	2023-11-14 18:54:34.000000000 +0100
++++ piper-phonemize-2023.11.14/src/main.cpp	2025-11-16 19:28:38.234848816 +0100
+@@ -6,6 +6,8 @@
+ #include <vector>
+ 
+ #include <espeak-ng/speak_lib.h>
++#include <unistd.h>
++#include <fcntl.h>
+ 
+ #ifdef _MSC_VER
+ #define WIN32_LEAN_AND_MEAN
+@@ -13,7 +15,7 @@
+ #include <windows.h>
+ #endif
+ 
+-#include "json.hpp"
++#include <nlohmann/json.hpp>
+ #include "phoneme_ids.hpp"
+ #include "phonemize.hpp"
+ #include "tashkeel.hpp"
+@@ -59,7 +61,10 @@ int main(int argc, char *argv[]) {
+   if (runConfig.phonemeType == eSpeakPhonemes) {
+     // Need to initialize eSpeak
+     if (!runConfig.eSpeakDataPath) {
+-      throw std::runtime_error(
++      if(!access("/usr/share/espeak-ng-data", R_OK))
++        runConfig.eSpeakDataPath = "/usr/share/espeak-ng-data";
++      else
++        throw std::runtime_error(
+           "--espeak_data is required with path to espeak-ng-data directory");
+     }
+ 
