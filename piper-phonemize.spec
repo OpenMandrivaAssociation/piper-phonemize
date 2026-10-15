@@ -4,7 +4,7 @@
 
 Name:		piper-phonemize
 Version:	2023.11.14
-Release:	1
+Release:	2
 Source0:	https://github.com/rhasspy/piper-phonemize/archive/refs/tags/%{version}-4.tar.gz
 Summary:	Phonemize library used by old versions of the Piper TTS engine
 URL:		https://github.com/rhasspy/piper-phonemize
@@ -12,7 +12,7 @@ License:	MIT
 Group:		System/Libraries
 BuildSystem:	cmake
 BuildRequires:	pkgconfig(nlohmann_json)
-BuildRequires:	pkgconfig(libonnxruntime)
+BuildRequires:	pkgconfig(libonnxruntime) >= 1.28.0
 BuildRequires:	pkgconfig(espeak-ng)
 
 %patchlist
